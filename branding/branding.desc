@@ -1,0 +1,26 @@
+---
+componentName:  hawaii
+
+strings:
+    productName:         Hawaii
+    shortProductName:    Hawaii
+    version:             0.0.0
+    shortVersion:        0.0
+    versionedName:       Hawaii 0.0 "Codename"
+    shortVersionedName:  Hawaii 1.0
+    bootloaderEntryName: Hawaii
+    productUrl:          http://hawaii-desktop.github.io/
+    supportUrl:          http://hawaii-desktop.github.io/
+    knownIssuesUrl:      http://hawaii-desktop.github.io/
+    releaseNotesUrl:     http://hawaii-desktop.github.io/
+
+images:
+    productLogo:         "squid.png"
+    productIcon:         "squid.png"
+
+slideshow:               "show.qml"
+
+style:
+   sidebarBackground:    "#292F34"
+   sidebarText:          "#FFFFFF"
+   sidebarTextSelect:    "#292F34"
