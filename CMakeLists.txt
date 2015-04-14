@@ -38,6 +38,7 @@ add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 # Subdirectories
 add_subdirectory(conf)
 add_subdirectory(data)
+add_subdirectory(modules)
 
 # Install
 install(DIRECTORY branding/
