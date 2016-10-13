@@ -1,12 +1,11 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Install Hawaii
+Name=Install to Hard Disk Drive
 GenericName=Live Installer
-TryExec=calamares
-Exec=pkexec /usr/bin/calamares
-Comment=Install the operating system to disk
+Exec=sudo -E /usr/bin/calamares --platform wayland
 Icon=system-software-install
 Terminal=false
 StartupNotify=false
 Categories=Qt;System;
+OnlyShowIn=X-Liri;
