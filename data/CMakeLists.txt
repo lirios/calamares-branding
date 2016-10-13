@@ -1,2 +1,2 @@
 install(FILES calamares.desktop
-        DESTINATION ${XDG_APPS_INSTALL_DIR})
+        DESTINATION ${DATA_INSTALL_DIR}/liri-calamares-branding)
