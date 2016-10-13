@@ -45,7 +45,7 @@ add_subdirectory(modules)
 
 # Install
 install(DIRECTORY branding/
-        DESTINATION ${DATA_INSTALL_DIR}/calamares/branding)
+        DESTINATION ${DATA_INSTALL_DIR}/calamares/branding/liri)
 
 # Display featute summary
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

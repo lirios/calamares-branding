@@ -1,26 +1,27 @@
 ---
-componentName:  hawaii
+componentName:  liri
 
 strings:
-    productName:         Hawaii
-    shortProductName:    Hawaii
-    version:             0.0.0
-    shortVersion:        0.0
-    versionedName:       Hawaii 0.0 "Codename"
-    shortVersionedName:  Hawaii 1.0
-    bootloaderEntryName: Hawaii
-    productUrl:          http://hawaii-desktop.github.io/
-    supportUrl:          http://hawaii-desktop.github.io/
-    knownIssuesUrl:      http://hawaii-desktop.github.io/
-    releaseNotesUrl:     http://hawaii-desktop.github.io/
+    productName:         Liri OS
+    shortProductName:    Liri
+    version:             0.9.0
+    shortVersion:        0.9
+    versionedName:       Liri OS 0.9.0
+    shortVersionedName:  Liri OS 0.9
+    bootloaderEntryName: Liri OS
+    productUrl:          http://liri.io/
+    supportUrl:          https://github.com/lirios/lirios/
+    knownIssuesUrl:      https://github.com/lirios/lirios/
+    releaseNotesUrl:     http://liri.io/releases/v0.9.0/
 
 images:
-    productLogo:         "squid.png"
-    productIcon:         "squid.png"
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "languages.png"
 
 slideshow:               "show.qml"
 
 style:
-   sidebarBackground:    "#292F34"
+   sidebarBackground:    "#37474f"
    sidebarText:          "#FFFFFF"
-   sidebarTextSelect:    "#292F34"
+   sidebarTextSelect:    "#2196F3"
