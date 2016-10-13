@@ -1,39 +1,43 @@
-Hawaii branding for Calamares
-=============================
+Calamares Branding
+==================
 
-[![GitHub release](https://img.shields.io/github/release/hawaii-desktop/hawaii-calamares-branding.svg)](https://github.com/hawaii-desktop/hawaii-calamares-branding)
-[![GitHub issues](https://img.shields.io/github/issues/hawaii-desktop/hawaii-calamares-branding.svg)](https://github.com/hawaii-desktop/hawaii-calamares-branding/issues)
+[![ZenHub.io](https://img.shields.io/badge/supercharged%20by-zenhub.io-blue.svg)](https://zenhub.io)
 
-This repository contains branding and customizations for Calamares,
-used by the Hawaii operating system live images.
+[![License](https://img.shields.io/badge/license-GPLv3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![GitHub release](https://img.shields.io/github/release/lirios/calamares-branding.svg)](https://github.com/lirios/calamares-branding)
+[![Build Status](https://travis-ci.org/lirios/calamares-branding.svg?branch=develop)](https://travis-ci.org/lirios/calamares-branding)
+[![GitHub issues](https://img.shields.io/github/issues/lirios/calamares-branding.svg)](https://github.com/lirios/calamares-branding/issues)
+[![Maintained](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/lirios/calamares-branding/commits/develop)
+
+Liri OS branding and customizations for Calamares.
 
 ## Dependencies
 
 In order to install branding and customizations you need:
 
-* [CMake](http://www.cmake.org)
-* [extra-cmake-modules](http://quickgit.kde.org/?p=extra-cmake-modules.git)
+ * [CMake](http://www.cmake.org)
+ * [ECM >= 1.7.0](http://quickgit.kde.org/?p=extra-cmake-modules.git)
 
 ## Installation
 
-Assuming you are in the source directory, just create a build directory
-and run cmake:
+From the root of the repository, run:
 
 ```sh
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/opt/hawaii ..
+mkdir build; cd build
+cmake .. -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
+make
+make install # use sudo if necessary
 ```
 
-If not passed, the `CMAKE_INSTALL_PREFIX` parameter defaults to /usr/local.
-You have to specify a path that fits your needs, /opt/hawaii is just an example.
+On the `cmake` line, you can specify additional configuration parameters:
 
-Package maintainers would pass `-DCMAKE_INSTALL_PREFIX=/usr`.
+ * `-DCMAKE_INSTALL_PREFIX=/path/to/install` (for example, `/opt/liri` or `/usr`)
+ * `-DCMAKE_BUILD_TYPE=<build_type>`, where `<build_type>` is one of:
+   * **Debug:** debug build
+   * **Release:** release build
+   * **RelWithDebInfo:** release build with debugging information
 
-Now type:
+## Licensing
 
-```sh
-make install
-```
-
-from the build directory.
+Licensed under the terms of the GNU General Public License version 3 or,
+at your option, any later version.

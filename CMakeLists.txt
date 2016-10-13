@@ -1,39 +1,42 @@
-project(HawaiiBranding)
+project(CalamaresBranding)
 
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_policy(VERSION 3.4.1)
+
+# Instruct CMake to run moc and rrc automatically when needed
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# Apple-specific configuration
+set(APPLE_SUPPRESS_X11_WARNING ON)
 
 # Set version
 set(PROJECT_VERSION "0.0.0")
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_SOVERSION 0)
 
-# ECM
-find_package(ECM 0.0.11 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
-
-# Installation directories
-include(KDEInstallDirs)
-
-# Macro to print feature summary
-include(FeatureSummary)
-
-# Add custom uninstall target
-if ("${ECM_VERSION}" VERSION_LESS "1.7.0")
-    # ECM 1.7.0 provides this target, so we can't roll our own (see issue #172)
-    configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-        IMMEDIATE @ONLY)
-    add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+if(NOT USE_SUPERBUILD)
+    # Set up packaging
+    set(CPACK_PACKAGE_NAME "liri-calamares-branding")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    set(CPACK_GENERATOR "TGZ")
+    set(CPACK_SET_DESTDIR FALSE)
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+    set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git;/.tx/;~$;${CPACK_SOURCE_IGNORE_FILES}")
+    include(CPack)
+    add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 endif()
 
-# Set up packaging
-set(CPACK_PACKAGE_NAME "hawaii-calamares-branding")
-set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
-set(CPACK_GENERATOR "TGZ")
-set(CPACK_SET_DESTDIR FALSE)
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
-set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git;/*.user;/.tx/;~$;${CPACK_SOURCE_IGNORE_FILES}")
-include(CPack)
-add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
+# ECM
+find_package(ECM 1.7.0 REQUIRED NO_MODULE)
+list(APPEND CMAKE_MODULE_PATH
+     "${ECM_MODULE_PATH}"
+     "${ECM_KDE_MODULE_DIR}"
+)
+
+# Macros
+include(FeatureSummary)
+include(KDEInstallDirs)
 
 # Subdirectories
 add_subdirectory(conf)
