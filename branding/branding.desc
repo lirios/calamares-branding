@@ -9,10 +9,10 @@ strings:
     versionedName:       Liri OS 0.9.0
     shortVersionedName:  Liri OS 0.9
     bootloaderEntryName: Liri OS
-    productUrl:          http://liri.io/
+    productUrl:          https://liri.io/
     supportUrl:          https://github.com/lirios/lirios/
     knownIssuesUrl:      https://github.com/lirios/lirios/
-    releaseNotesUrl:     http://liri.io/releases/v0.9.0/
+    releaseNotesUrl:     https://liri.io/releases/v0.9.0/
 
 images:
     productLogo:         "logo.png"
