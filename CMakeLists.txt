@@ -40,6 +40,7 @@ include(KDEInstallDirs)
 
 # Subdirectories
 add_subdirectory(data)
+add_subdirectory(modules)
 add_subdirectory(settings)
 
 # Install

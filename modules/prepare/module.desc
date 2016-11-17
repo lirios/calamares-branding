@@ -1,0 +1,7 @@
+---
+type:       "job"
+name:       "prepare"
+interface:  "process"
+chroot:     true
+command:    "/bin/sh -c \"pacman-key --init && pacman-key --populate\""
+timeout:    30
