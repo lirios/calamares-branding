@@ -1,2 +1,2 @@
 install(DIRECTORY prepare/
-        DESTINATION ${LIB_INSTALL_DIR}/calamares/modules)
+        DESTINATION ${LIB_INSTALL_DIR}/calamares/modules/prepare)
