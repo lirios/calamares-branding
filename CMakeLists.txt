@@ -39,13 +39,14 @@ include(FeatureSummary)
 include(KDEInstallDirs)
 
 # Subdirectories
-add_subdirectory(conf)
 add_subdirectory(data)
 add_subdirectory(modules)
 
 # Install
 install(DIRECTORY branding/
         DESTINATION ${DATA_INSTALL_DIR}/calamares/branding/liri)
+install(FILES settings.conf
+        DESTINATION ${SYSCONF_INSTALL_DIR}/calamares)
 
 # Display featute summary
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
