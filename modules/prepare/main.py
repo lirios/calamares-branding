@@ -29,6 +29,8 @@ def run():
 
     - Initialize and populate pacman keyring so we can install
       packages later.
+    - Install the kernel which is not included in the image.
+    - Remove live media packages.
     - Rewrite os-release.
 
     This job must be executed before packages and grubcfg.
@@ -38,6 +40,8 @@ def run():
 
     libcalamares.utils.target_env_call(["pacman-key", "--init"])
     libcalamares.utils.target_env_call(["pacman-key", "--populate"])
+    libcalamares.utils.target_env_call(["pacman", "-Sy", "--noconfirm", "linux"])
+    libcalamares.utils.target_env_call(["pacman", "-R", "--noconfirm", "calamares", "liri-calamares-branding-git"])
 
     os_release = os.path.join(install_path, "usr", "lib", "os-release")
     try:
