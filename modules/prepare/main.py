@@ -21,6 +21,7 @@
 # $END_LICENSE$
 #
 
+import os
 import libcalamares
 
 def run():
