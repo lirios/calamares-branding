@@ -31,7 +31,6 @@ def run():
     - Initialize and populate pacman keyring so we can install
       packages later.
     - Install the kernel which is not included in the image.
-    - Remove live media packages.
     - Remove sudo configuration for the installer.
     - Rewrite os-release.
 
