@@ -22,6 +22,7 @@
 #
 
 import os
+import shutil
 import libcalamares
 
 def run():
@@ -40,8 +41,9 @@ def run():
 
     libcalamares.utils.target_env_call(["pacman-key", "--init"])
     libcalamares.utils.target_env_call(["pacman-key", "--populate"])
-    libcalamares.utils.target_env_call(["pacman", "-Sy", "--noconfirm", "linux"])
-    libcalamares.utils.target_env_call(["pacman", "-R", "--noconfirm", "calamares", "liri-calamares-branding-git"])
+
+    boot_path = os.path.join(install_path, "boot", "vmlinuz-linux")
+    shutil.copyfile("/run/archiso/bootmnt/liri/boot/x86_64/vmlinuz", boot_path)
 
     os_release = os.path.join(install_path, "usr", "lib", "os-release")
     try:
