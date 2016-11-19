@@ -32,6 +32,7 @@ def run():
       packages later.
     - Install the kernel which is not included in the image.
     - Remove live media packages.
+    - Remove sudo configuration for the installer.
     - Rewrite os-release.
 
     This job must be executed before packages and grubcfg.
@@ -44,6 +45,11 @@ def run():
 
     boot_path = os.path.join(install_path, "boot", "vmlinuz-linux")
     shutil.copyfile("/run/archiso/bootmnt/liri/boot/x86_64/vmlinuz", boot_path)
+
+    sudoers_livemedia_path = os.path.join(install_path, "etc", "sudoers.d", "00-livemedia")
+    sudoers_installer_path = os.path.join(install_path, "etc", "sudoers.d", "10-installer")
+    os.unlink(sudoers_livemedia_path)
+    os.unlink(sudoers_installer_path)
 
     os_release = os.path.join(install_path, "usr", "lib", "os-release")
     try:
