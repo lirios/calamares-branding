@@ -45,10 +45,10 @@ def run():
     boot_path = os.path.join(install_path, "boot", "vmlinuz-linux")
     shutil.copyfile("/run/archiso/bootmnt/liri/boot/x86_64/vmlinuz", boot_path)
 
-    sudoers_livemedia_path = os.path.join(install_path, "etc", "sudoers.d", "00-livemedia")
-    sudoers_installer_path = os.path.join(install_path, "etc", "sudoers.d", "10-installer")
-    os.unlink(sudoers_livemedia_path)
-    os.unlink(sudoers_installer_path)
+    for sudoers_filename in ("00-livemedia", "10-installer"):
+        sudoers_path = os.path.join(install_path, "etc", "sudoers.d", sudoers_filename)
+        if os.path.exists(sudoers_path):
+            os.unlink(sudoers_path)
 
     os_release = os.path.join(install_path, "usr", "lib", "os-release")
     try:
