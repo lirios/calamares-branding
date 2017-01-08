@@ -50,7 +50,9 @@ def run():
         if os.path.exists(sudoers_path):
             os.unlink(sudoers_path)
 
-    os_release = os.path.join(install_path, "usr", "lib", "os-release")
+    os_release = os.path.join(install_path, "etc", "os-release")
+    if os.path.exists(os_release):
+        os.unlink(os_release)
     try:
         with open(os_release, "w") as fd:
             fd.write('NAME="Liri OS"\n')
