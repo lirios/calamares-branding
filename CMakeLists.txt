@@ -45,9 +45,9 @@ add_subdirectory(settings)
 
 # Install
 install(DIRECTORY branding/
-        DESTINATION ${DATA_INSTALL_DIR}/calamares/branding/liri)
+        DESTINATION /usr/share/calamares/branding/liri)
 install(FILES settings.conf
-        DESTINATION ${SYSCONF_INSTALL_DIR}/calamares)
+        DESTINATION /etc/calamares)
 
 # Display featute summary
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
