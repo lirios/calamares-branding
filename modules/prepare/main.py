@@ -50,6 +50,10 @@ def run():
         if os.path.exists(sudoers_path):
             os.unlink(sudoers_path)
 
+    sddm_conf_path = os.path.join(install_path, "usr", "lib", "sddm", "sddm.conf.d", "01-livemedia.conf")
+    if os.path.exists(sddm_conf_path):
+        os.unlink(sddm_conf_path)
+
     os_release = os.path.join(install_path, "etc", "os-release")
     if os.path.exists(os_release):
         os.unlink(os_release)
