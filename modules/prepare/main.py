@@ -54,6 +54,10 @@ def run():
     if os.path.exists(sddm_conf_path):
         os.unlink(sddm_conf_path)
 
+    mkinitcpio_path = os.path.join(install_path, "etc", "mkinitcpio-archiso.conf")
+    if os.path.exists(mkinitcpio_path):
+        os.unlink(mkinitcpio_path)
+
     os_release = os.path.join(install_path, "etc", "os-release")
     if os.path.exists(os_release):
         os.unlink(os_release)
