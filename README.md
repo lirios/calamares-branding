@@ -7,7 +7,7 @@ Calamares Branding
 [![GitHub release](https://img.shields.io/github/release/lirios/calamares-branding.svg)](https://github.com/lirios/calamares-branding)
 [![Build Status](https://travis-ci.org/lirios/calamares-branding.svg?branch=develop)](https://travis-ci.org/lirios/calamares-branding)
 [![GitHub issues](https://img.shields.io/github/issues/lirios/calamares-branding.svg)](https://github.com/lirios/calamares-branding/issues)
-[![Maintained](https://img.shields.io/maintenance/yes/2016.svg)](https://github.com/lirios/calamares-branding/commits/develop)
+[![Maintained](https://img.shields.io/maintenance/yes/2018.svg)](https://github.com/lirios/calamares-branding/commits/develop)
 
 Liri OS branding and customizations for Calamares.
 
