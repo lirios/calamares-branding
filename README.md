@@ -11,31 +11,39 @@ Calamares Branding
 
 Liri OS branding and customizations for Calamares.
 
-## Dependencies
-
-In order to install branding and customizations you need:
-
- * [CMake](http://www.cmake.org)
- * [ECM >= 1.7.0](http://quickgit.kde.org/?p=extra-cmake-modules.git)
-
 ## Installation
 
-From the root of the repository, run:
+We use the [Qbs](http://doc.qt.io/qbs/) build system.
+
+If you want to learn more, please read the [Qbs manual](http://doc.qt.io/qbs/index.html),
+especially the [setup guide](http://doc.qt.io/qbs/configuring.html) and how to install artifacts
+from the [installation guide](http://doc.qt.io/qbs/installing-files.html).
+
+If you haven't already, start by setting up a `qt5` profile for `qbs`:
 
 ```sh
-mkdir build; cd build
-cmake .. -DKDE_INSTALL_USE_QT_SYS_PATHS=ON
-make
-make install # use sudo if necessary
+qbs setup-toolchains --type gcc /usr/bin/g++ gcc
+qbs setup-qt $(which qmake) qt5 # make sure that qmake is in PATH
+qbs config profiles.qt5.baseProfile gcc
 ```
 
-On the `cmake` line, you can specify additional configuration parameters:
+Then, from the root of the repository, run:
 
- * `-DCMAKE_INSTALL_PREFIX=/path/to/install` (for example, `/opt/liri` or `/usr`)
- * `-DCMAKE_BUILD_TYPE=<build_type>`, where `<build_type>` is one of:
-   * **Debug:** debug build
-   * **Release:** release build
-   * **RelWithDebInfo:** release build with debugging information
+```sh
+qbs -d build -j $(nproc) profile:qt5 # use sudo if necessary
+```
+
+To the `qbs` call above you can append additional configuration parameters:
+
+ * `modules.lirideployment.prefix:/path/to/prefix` where most files are installed (default: `/usr/local`)
+ * `modules.lirideployment.dataDir:path/to/lib` where data files are installed (default: `/usr/local/share`)
+ * `modules.lirideployment.libDir:path/to/lib` where libraries are installed (default: `/usr/local/lib`)
+ * `modules.lirideployment.qmlDir:path/to/qml` where QML plugins are installed (default: `/usr/local/lib/qml`)
+ * `modules.lirideployment.pluginsDir:path/to/plugins` where Qt plugins are installed (default: `/usr/local/lib/plugins`)
+ * `modules.lirideployment.qbsModulesDir:path/to/qbs` where Qbs modules are installed (default: `/usr/local/share/qbs/modules`)
+
+See [lirideployment.qbs](https://github.com/lirios/qbs-shared/blob/develop/modules/lirideployment/lirideployment.qbs)
+for more deployment-related parameters.
 
 ## Licensing
 
