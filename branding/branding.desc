@@ -19,7 +19,7 @@ images:
     productIcon:         "logo.png"
     productWelcome:      "languages.png"
 
-slideshow:               "show.qml"
+slideshow:               "Slideshow.qml"
 
 style:
    sidebarBackground:    "#37474f"
