@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    exec sudo -E calamares --platform wayland
+else
+    exec pkexec calamares
+fi

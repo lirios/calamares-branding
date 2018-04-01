@@ -9,8 +9,8 @@ Project {
 
     references: [
         "branding/branding.qbs",
-        "data/data.qbs",
         "modules/modules.qbs",
+        "scripts/scripts.qbs",
         "settings/settings.qbs",
     ]
 
