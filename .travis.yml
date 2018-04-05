@@ -10,19 +10,13 @@ env:
     # DEPLOY_HOST
     - secure: "WZ4o8ZaVpuaAA8mrBOHuYHy5QHLUkwgkHo0sDMKKshYm/eYrCoJ5vtO2Y3vZAC0KSAwRThtVU2hoC/gBP6/LVJJTmnIWmPbY6gVxgrCJvBC2ADzL7eZW8XtlX1IURi94RXrhU6TPbxZTRKQ9t5tidpBib+jeqtQRtp40gTuOlyWV7UElBX0qj2cRmadVVSRy09zkV83cyFLngEjTJmwNRWAyAvwMwFal1m4vDnXq2A9ttPxVtIoOjSXYrZr0F1xt7inrIQr9m+SZDFbCG2iripYTAwX5DLBRG9bxd8up97WntMn3MdS6VcZVm+5c94wB7I45JP2XICm3vuIEvMD2q3ZfVHttq4fOZ2+TK5YbYCI3uL0cIBL/OvtRNeZq0twYBk0yq2ioxVzXQeSAFN9XyrZ9BtG2YK9bXJfyxbStlmcVNX/MIErW4OmVinW8UPWO0LsRgVQrBhgjUOMQ7Fng2vOjTwi1W/DK+OJ8YwLGMjFWTSgd314prjgLcVTAUf3w7QTjdT3DU/Tp/isZtIzyxoHBATiQdfx+0m83Eb0LdWDW7Z/A5hUt8gAmGZlyGcq3MVfDuDAuKv6BYN/3qcXHQFI3gtHrVZG+Kz2eBNzClcpuEweZFxWIJTutZi5ajugSpsybU1QCmOxJojqmI5Cmg2xZqInqDDRe7A7J0iOHVYo="
 
-arch:
-  artifacts:
-    - qbs-shared-artifacts.tar.gz
-  packages:
-    - qbs
-  script:
-    - qbs-setup-toolchains --detect
-    - qbs-setup-qt /usr/bin/qmake-qt5 qt5
-    - qbs config profiles.qt5.baseProfile ${CC}
-    - qbs build -d build -j $(nproc) profile:qt5 modules.lirideployment.prefix:/usr
+branches:
+  except:
+    - /^(?i:continuous)$/
 
 script:
-  - "curl -s https://raw.githubusercontent.com/lirios/repotools/develop/travis/docker-travis.sh | bash"
+  - wget -c https://raw.githubusercontent.com/lirios/infra-travis/master/run
+  - bash run ./.travis/build.sh
 
 notifications:
   email: false
