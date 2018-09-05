@@ -22,6 +22,7 @@ Product {
             "packages.conf",
             "removeuser.conf",
             "unpackfs.conf",
+            "welcome.conf",
         ]
         qbs.install: true
         qbs.installDir: lirideployment.etcDir + "/calamares/modules"
