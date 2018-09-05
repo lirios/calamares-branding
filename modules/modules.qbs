@@ -7,11 +7,11 @@ Product {
 
     Group {
         name: "prepare module"
-prefix: "prepare/"
+        prefix: "prepare/"
         files: [
-"main.py",
-"module.desc"
-]
+            "main.py",
+            "module.desc"
+        ]
         qbs.install: true
         qbs.installDir: lirideployment.libDir + "/calamares/modules/prepare"
     }
