@@ -24,6 +24,6 @@ Product {
             "unpackfs.conf",
         ]
         qbs.install: true
-        qbs.installDir: lirideployment.etcDir + "/calamares"
+        qbs.installDir: lirideployment.etcDir + "/calamares/modules"
     }
 }
