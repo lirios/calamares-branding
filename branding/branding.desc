@@ -4,10 +4,10 @@ componentName:  liri
 strings:
     productName:         Liri OS
     shortProductName:    Liri
-    version:             0.9.0
-    shortVersion:        0.9
-    versionedName:       Liri OS 0.9.0
-    shortVersionedName:  Liri OS 0.9
+    version:             0.10.0
+    shortVersion:        0.10
+    versionedName:       Liri OS 0.10.0
+    shortVersionedName:  Liri OS 0.10
     bootloaderEntryName: Liri OS
     productUrl:          https://liri.io/
     supportUrl:          https://github.com/lirios/lirios/
