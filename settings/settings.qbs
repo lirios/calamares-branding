@@ -18,7 +18,6 @@ Product {
             "bootloader.conf",
             "displaymanager.conf",
             "grubcfg.conf",
-            "initcpio.conf",
             "packages.conf",
             "removeuser.conf",
             "unpackfs.conf",
