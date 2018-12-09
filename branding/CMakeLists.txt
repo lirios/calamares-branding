@@ -1,0 +1,12 @@
+install(
+    FILES
+        "branding.desc"
+        "FocusText.qml"
+        "languages.png"
+        "logo.png"
+        "SlideImage.qml"
+        "Slideshow.qml"
+        "wallpaper.png"
+    DESTINATION
+        "${INSTALL_DATADIR}/calamares/branding/liri"
+)
