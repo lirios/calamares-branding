@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10.0)
 project("CalamaresBranding"
     VERSION "0.9.0"
     DESCRIPTION "Modules and configuration for the Calamares installer"
-    LANGUAGES CXX C
+    LANGUAGES NONE
 )
 
 ## Shared macros and functions:
