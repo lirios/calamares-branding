@@ -47,14 +47,16 @@ def run():
         'gpg-verify': GLib.Variant('b', not nogpg),
         'tls-permissive': GLib.Variant('b', noverifyssl),
     }
-    ref = RpmOstree.varsubst_baserarch('lirios/unstable/${basearch}/desktop')
+    ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
     remote_name = 'lirios'
     remote_url = 'https://repo.liri.io/ostree/repo/'
     install_path = libcalamares.globalstorage.value('rootMountPoint')
+    libcalamares.utils.debug('Ref: %s\n' % ref)
+    libcalamares.utils.debug('Install path: %s\n' % install_path)
 
     # Initialize sysroot
-    subprocess.run(['ostree', 'admin', '--sysroot=' + install_path,
-                    'init-fs', install_path], check=True)
+    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+                           'init-fs', install_path])
 
     # Load sysroot
     sysroot_file = Gio.File.new_for_path(install_path)
@@ -79,7 +81,7 @@ def run():
                 GLib.Variant('a{sv}', pull_options),
                 progress, cancellable)
     except GLib.GError as e:
-        libcalamares.utils.error('Failed to pull from repository')
+        libcalamares.utils.debug('Failed to pull from repository')
         return ('Failed to pull from repository', e.message)
 
     # Deploy
@@ -92,7 +94,7 @@ def run():
     sysroot.load(None)
     deployments = sysroot.get_deployments()
     if len(deployments) > 0:
-        libcalamares.utils.error('No deployments available')
+        libcalamares.utils.debug('No deployments available')
         return ('No deployments found', 'OSTree failed to deploy operating system.')
     deployment = deployments[0]
     deployment_path = sysroot.get_deployment_directory(deployment).get_path()
@@ -113,6 +115,6 @@ def progress_cb(async_progress):
         if requested == 0:
             percent = 0.0
         else:
-            percent = (fetched * (1.0 / requested)) * 100
+            percent = fetched / requested
         libcalamares.job.setprogress(percent)
     libcalamares.utils.debug(accumulator)
