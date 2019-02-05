@@ -23,6 +23,7 @@
 #
 
 import gi
+import json
 import subprocess
 import sys
 
@@ -77,7 +78,7 @@ def install(install_path):
                 progress, cancellable)
     except GLib.GError as e:
         print('Failed to pull from repository')
-        print('Failed to pull from repository', e.message, file=sys.stderr)
+        print(json.dumps(('Failed to pull from repository', e.message)), file=sys.stderr)
         return False
 
     # Deploy
@@ -91,7 +92,7 @@ def install(install_path):
     deployments = sysroot.get_deployments()
     if len(deployments) == 0:
         print('No deployments available')
-        print('No deployments found\nOSTree failed to deploy operating system.', file=sys.stderr)
+        print(json.dumps(('No deployments found', 'OSTree failed to deploy operating system.')), file=sys.stderr)
         return False
     deployment = deployments[0]
     deployment_path = sysroot.get_deployment_directory(deployment).get_path()
@@ -102,11 +103,10 @@ def install(install_path):
 
 
 def progress_cb(async_progress):
-    accumulator = '** OSTree'
     status = async_progress.get_status()
     outstanding_fetches = async_progress.get_uint('outstanding-fetches')
     if status:
-        accumulator += '\nStatus: ' + status
+        print('Status: {}'.format(status))
     elif outstanding_fetches > 0:
         fetched = async_progress.get_uint('fetched')
         requested = async_progress.get_uint('requested')
@@ -115,7 +115,6 @@ def progress_cb(async_progress):
         else:
             percent = fetched / requested
         print('PROGRESS:{}'.format(percent))
-    print(accumulator)
 
 
 if __name__ == '__main__':

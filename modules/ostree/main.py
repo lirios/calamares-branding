@@ -21,6 +21,7 @@
 # $END_LICENSE$
 #
 
+import json
 import subprocess
 import libcalamares
 
@@ -53,7 +54,7 @@ def run():
                 else:
                     libcalamares.utils.debug(line)
         else:
-            return stderr.decode('utf-8').split('\n')
+            return json.loads(stderr.decode('utf-8'))
 
     if deployment_path is None:
         return ('No deployment path', 'Unable to find OS tree deployment.')
