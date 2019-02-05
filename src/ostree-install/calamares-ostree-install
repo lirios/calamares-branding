@@ -1,0 +1,129 @@
+#!/usr/bin/python3
+#
+# This file is part of Liri.
+#
+# Copyright (C) 2019 Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+#
+# $BEGIN_LICENSE:GPL3+$
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# $END_LICENSE$
+#
+
+import gi
+import subprocess
+import sys
+
+gi.require_version('GLib', '2.0')
+gi.require_version('OSTree', '1.0')
+gi.require_version('RpmOstree', '1.0')
+
+from gi.repository import GLib, Gio, OSTree, RpmOstree
+
+
+def install(install_path):
+    cancellable = None
+
+    osname = 'lirios'
+    nogpg = True
+    noverifyssl = True
+    remote_options = {
+        'gpg-verify': GLib.Variant('b', not nogpg),
+        'tls-permissive': GLib.Variant('b', noverifyssl),
+    }
+    ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
+    remote_name = 'lirios'
+    remote_url = 'https://repo.liri.io/ostree/repo/'
+    print('Ref: %s' % ref)
+    print('Install path: %s' % install_path)
+
+    # Initialize sysroot
+    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+                           'init-fs', install_path])
+
+    # Load sysroot
+    sysroot_file = Gio.File.new_for_path(install_path)
+    sysroot = OSTree.Sysroot.new(sysroot_file)
+    sysroot.load(cancellable)
+
+    # We don't support resuming from interrupted installs
+    repo = sysroot.get_repo(None)[1]
+    repo.set_disable_fsync(True)
+
+    repo.remote_change(None, OSTree.RepoRemoteChange.ADD_IF_NOT_EXISTS,
+                       remote_name, remote_url,
+                       GLib.Variant('a{sv}', remote_options), cancellable)
+
+    progress = OSTree.AsyncProgress.new()
+    progress.connect('changed', progress_cb)
+
+    # Pull
+    pull_options = {'refs': GLib.Variant('as', [ref])}
+    try:
+        repo.pull_with_options(remote_name,
+                GLib.Variant('a{sv}', pull_options),
+                progress, cancellable)
+    except GLib.GError as e:
+        print('Failed to pull from repository')
+        print('Failed to pull from repository', e.message, file=sys.stderr)
+        return False
+
+    # Deploy
+    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+        'os-init', osname])
+    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+        'deploy', '--os=' + osname, '%s:%s' % (remote_name, ref)])
+
+    # Determine the path of the new deployment
+    sysroot.load(None)
+    deployments = sysroot.get_deployments()
+    if len(deployments) == 0:
+        print('No deployments available')
+        print('No deployments found\nOSTree failed to deploy operating system.', file=sys.stderr)
+        return False
+    deployment = deployments[0]
+    deployment_path = sysroot.get_deployment_directory(deployment).get_path()
+    print('Deployment path: %s' % deployment_path)
+    print('RESULT:%s' % deployment_path)
+
+    return True
+
+
+def progress_cb(async_progress):
+    accumulator = '** OSTree'
+    status = async_progress.get_status()
+    outstanding_fetches = async_progress.get_uint('outstanding-fetches')
+    if status:
+        accumulator += '\nStatus: ' + status
+    elif outstanding_fetches > 0:
+        fetched = async_progress.get_uint('fetched')
+        requested = async_progress.get_uint('requested')
+        if requested == 0:
+            percent = 0.0
+        else:
+            percent = fetched / requested
+        print('PROGRESS:{}'.format(percent))
+    print(accumulator)
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('installpath', help='where to install the OS tree')
+    args = parser.parse_args()
+
+    if not install(args.installpath):
+        sys.exit(-1)

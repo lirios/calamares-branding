@@ -21,100 +21,41 @@
 # $END_LICENSE$
 #
 
-import gi
-import os
-import shutil
 import subprocess
 import libcalamares
-
-gi.require_version('GLib', '2.0')
-gi.require_version('OSTree', '1.0')
-gi.require_version('RpmOstree', '1.0')
-
-from gi.repository import GLib, Gio, OSTree, RpmOstree
-
 
 def run():
     """
     Install the OS tree on the root file system.
     """
 
-    cancellable = None
-    osname = 'lirios'
-    nogpg = True
-    noverifyssl = True
-    remote_options = {
-        'gpg-verify': GLib.Variant('b', not nogpg),
-        'tls-permissive': GLib.Variant('b', noverifyssl),
-    }
-    ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
-    remote_name = 'lirios'
-    remote_url = 'https://repo.liri.io/ostree/repo/'
     install_path = libcalamares.globalstorage.value('rootMountPoint')
-    libcalamares.utils.debug('Ref: %s\n' % ref)
-    libcalamares.utils.debug('Install path: %s\n' % install_path)
 
-    # Initialize sysroot
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-                           'init-fs', install_path])
+    progname = '/usr/bin/calamares-ostree-install'
 
-    # Load sysroot
-    sysroot_file = Gio.File.new_for_path(install_path)
-    sysroot = OSTree.Sysroot.new(sysroot_file)
-    sysroot.load(cancellable)
+    # The Calamares Python interpreter freezes when loading gobject-introspection, so we moved the
+    # code to an external process
 
-    # We don't support resuming from interrupted installs
-    repo = sysroot.get_repo(None)[1]
-    repo.set_disable_fsync(True)
+    deployment_path = None
 
-    repo.remote_change(None, OSTree.RepoRemoteChange.ADD_IF_NOT_EXISTS,
-                       remote_name, remote_url,
-                       GLib.Variant('a{sv}', remote_options), cancellable)
+    with subprocess.Popen([progname, install_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+        (stdout, stderr) = p.communicate()
 
-    progress = OSTree.AsyncProgress.new()
-    progress.connect('changed', progress_cb)
+        if p.returncode == 0:
+            output = stdout.decode('utf-8')
+            for line in output.split('\n'):
+                if line.startswith('PROGRESS'):
+                    percent = float(line[9:])
+                    libcalamares.job.setprogress(percent)
+                elif line.startswith('RESULT'):
+                    deployment_path = line[7:]
+                    libcalamares.globalstorage.insert('ostreeDeploymentPath', deployment_path)
+                else:
+                    libcalamares.utils.debug(line)
+        else:
+            return stderr.decode('utf-8').split('\n')
 
-    # Pull
-    pull_options = {'refs': GLib.Variant('as', [ref])}
-    try:
-        repo.pull_with_options(remote_name,
-                GLib.Variant('a{sv}', pull_options),
-                progress, cancellable)
-    except GLib.GError as e:
-        libcalamares.utils.debug('Failed to pull from repository')
-        return ('Failed to pull from repository', e.message)
-
-    # Deploy
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-        'os-init', osname])
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-        'deploy', '--os=' + osname, '%s:%s' % (remote_name, ref)])
-
-    # Determine the path of the new deployment
-    sysroot.load(None)
-    deployments = sysroot.get_deployments()
-    if len(deployments) > 0:
-        libcalamares.utils.debug('No deployments available')
-        return ('No deployments found', 'OSTree failed to deploy operating system.')
-    deployment = deployments[0]
-    deployment_path = sysroot.get_deployment_directory(deployment).get_path()
-    libcalamares.utils.debug('Deployment path: %s\n' % deployment_path)
+    if deployment_path is None:
+        return ('No deployment path', 'Unable to find OS tree deployment.')
 
     return None
-
-
-def progress_cb(async_progress):
-    accumulator = '** OSTree'
-    status = async_progress.get_status()
-    outstanding_fetches = async_progress.get_uint('outstanding-fetches')
-    if status:
-        accumulator += '\nStatus: ' + status
-    elif outstanding_fetches > 0:
-        fetched = async_progress.get_uint('fetched')
-        requested = async_progress.get_uint('requested')
-        if requested == 0:
-            percent = 0.0
-        else:
-            percent = fetched / requested
-        libcalamares.job.setprogress(percent)
-    libcalamares.utils.debug(accumulator)
