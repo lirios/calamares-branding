@@ -37,6 +37,8 @@ from gi.repository import GLib, Gio, OSTree, RpmOstree
 def install(install_path):
     cancellable = None
 
+    DEVNULL = open('/dev/null', 'w')
+
     osname = 'lirios'
     nogpg = True
     noverifyssl = True
@@ -51,8 +53,11 @@ def install(install_path):
     print('Install path: %s' % install_path)
 
     # Initialize sysroot
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-                           'init-fs', install_path])
+    exit_code = subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+                                       'init-fs', install_path], stdout=DEVNULL)
+    if exit_code != 0:
+        print(json.dumps(('Initialization failed', 'OSTree preparation failed.')), file=sys.stderr)
+        return False
 
     # Load sysroot
     sysroot_file = Gio.File.new_for_path(install_path)
@@ -82,10 +87,16 @@ def install(install_path):
         return False
 
     # Deploy
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-        'os-init', osname])
-    subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
-        'deploy', '--os=' + osname, '%s:%s' % (remote_name, ref)])
+    exit_code = subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+                                       'os-init', osname], stdout=DEVNULL)
+    if exit_code != 0:
+        print(json.dumps(('Failed to initialize', 'OSTree initialization failed.')), file=sys.stderr)
+        return False
+    exit_code = subprocess.check_call(['ostree', 'admin', '--sysroot=' + install_path,
+                                       'deploy', '--os=' + osname, '%s:%s' % (remote_name, ref)], stdout=DEVNULL)
+    if exit_code != 0:
+        print(json.dumps(('Deployment failed', 'OSTree failed to deploy the operating system tree.')), file=sys.stderr)
+        return False
 
     # Determine the path of the new deployment
     sysroot.load(None)
