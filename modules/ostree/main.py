@@ -24,13 +24,88 @@
 import json
 import subprocess
 import libcalamares
+import os
+
+def mkdir_p(path):
+    """
+    Creates all subdirectories leading to the path.
+
+    :param path: Path
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def bind_mount(src, dest=None, bind_ro=False, recurse=True):
+    """
+    Bind mount source to destination.
+
+    :param src: Source path
+    :param dest: Destination path
+    :param bind_ro: Mount read-only
+    :param recurse: Use --rbind to recurse, otherwise plain --bind
+    """
+
+    if libcalamares.globalstorage.contains('extraMounts'):
+        extra_mounts = libcalamares.globalstorage.value('extraMounts')
+    else:
+        extra_mounts = []
+
+    # Same basename by default
+    if dest is None:
+        dest = src
+
+    # Make sure the mount point is created
+    mkdir_p(dest)
+
+    # Determine bind argument
+    if bind_ro:
+        subprocess.check_call(['mount', '--bind', src, src])
+        subprocess.check_call(['mount', '--bind', '-o', 'remount,ro', src, src])
+    else:
+        if recurse:
+            bindopt = '--rbind'
+        else:
+            bindopt = '--bind'
+        subprocess.check_call(['mount', bindopt, src, dest])
+
+    entry = {'device': src, 'mountPoint': dest}
+    if bind_ro or not recurse:
+        entry['options'] = 'bind'
+    extra_mounts.append(entry)
+    libcalamares.globalstorage.insert('extraMounts', extra_mounts)
+
 
 def run():
     """
     Install the OS tree on the root file system.
     """
 
+    # Installation path
     install_path = libcalamares.globalstorage.value('rootMountPoint')
+    if not install_path:
+        return ("No mount point for root partition in globalstorage",
+                "globalstorage does not contain a \"rootMountPoint\" key, "
+                "doing nothing")
+    if not os.path.exists(install_path):
+        return (f"Bad mount point for root partition in globalstorage",
+                 "globalstorage[\"rootMountPoint\"] is \"{install_path}\", which does not "
+                 "exist, doing nothing")
+
+    # Partitions
+    partitions = libcalamares.globalstorage.value('partitions')
+
+    # OSTree /var
+    varroot = install_path + '/ostree/deploy/lirios/var'
+
+    # If the user wants /var into a separate partition, we need to make OSTree
+    # put those files there during installation
+    has_var_mountpoint = False
+    for partition in partitions:
+        if partition['mountPoint'] == '/var':
+            has_var_mountpoint = True
+            bind_mount(install_path + '/var', varroot, recurse=False)
+            break
 
     progname = '/usr/bin/calamares-ostree-install'
 
@@ -58,5 +133,26 @@ def run():
 
     if deployment_path is None:
         return ('No deployment path', 'Unable to find OS tree deployment.')
+
+    # If /var is on the root file system we want to bind mount it to /var
+    # so that chroot will be able to see it
+    if has_var_mountpoint is False:
+        bind_mount(varroot, dest=install_path + '/var', recurse=False)
+
+    # Bind mount deployment into installation path for chroot
+    bind_mount(deployment_path, install_path)
+
+    # Run tmpfiles to make subdirectories of /var
+    subprocess.run(['systemd-tmpfiles', '--create', '--boot',
+                    '--root=' + install_path], check=False)
+
+    # Reverse extra mounts
+    extra_mounts = libcalamares.globalstorage.value('extraMounts')
+    extra_mounts.reverse()
+    libcalamares.globalstorage.insert('extraMounts', extra_mounts)
+
+    # Print extra mounts for debugging
+    for mount in libcalamares.globalstorage.value('extraMounts'):
+        libcalamares.utils.debug(f'Extra mount point: {mount}')
 
     return None
