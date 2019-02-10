@@ -47,19 +47,19 @@ def install(install_path):
     ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
     remote_name = 'lirios'
     remote_url = 'https://repo.liri.io/ostree/repo/'
-    print(f'Ref: {ref}')
-    print(f'Install path: {install_path}')
+    print(f'OUTPUT:Ref: {ref}')
+    print(f'OUTPUT:Install path: {install_path}')
 
     # Initialize sysroot
     try:
         p = subprocess.run(['ostree', 'admin', '--sysroot=' + install_path,
                             'init-fs', install_path], capture_output=True)
-        print(p.stdout.decode('utf-8'))
+        print('OUTPUT:' + p.stdout.decode('utf-8').rstrip())
         if p.returncode != 0:
-            print(json.dumps(('Initialization failed', 'OSTree preparation failed.')), file=sys.stderr)
+            print('ERROR:' + json.dumps(('Initialization failed', 'OSTree preparation failed.')))
             return False
     except Exception as e:
-        print(json.dumps(('Error executing ostreee', e.message)), file=sys.stderr)
+        print('ERROR:' + json.dumps(('Error executing ostreee', e.message)))
         return False
 
     # Load sysroot
@@ -85,43 +85,45 @@ def install(install_path):
                 GLib.Variant('a{sv}', pull_options),
                 progress, cancellable)
     except GLib.GError as e:
-        print('Failed to pull from repository')
-        print(json.dumps(('Failed to pull from repository', e.message)), file=sys.stderr)
+        print('OUTPUT:Failed to pull from repository')
+        print('ERROR:' + json.dumps(('Failed to pull from repository', e.message)))
         return False
 
     # Deploy
     try:
         p = subprocess.run(['ostree', 'admin', '--sysroot=' + install_path,
                             'os-init', osname], capture_output=True)
-        print(p.stdout.decode('utf-8'))
+        print('OUTPUT:' + p.stdout.decode('utf-8').rstrip())
         if p.returncode != 0:
-            print(json.dumps(('Failed to initialize', 'OSTree initialization failed.')), file=sys.stderr)
+            print('ERROR:' + json.dumps(('Failed to initialize', 'OSTree initialization failed.')))
             return False
     except Exception as e:
-        print(json.dumps(('Error executing ostreee', e.message)), file=sys.stderr)
+        print('ERROR:' + json.dumps(('Error executing ostreee', e.message)))
         return False
     try:
         p = subprocess.run(['ostree', 'admin', '--sysroot=' + install_path, 'deploy', '--os=' + osname,
                             f'{remote_name}:{ref}'], capture_output=True)
-        print(p.stdout.decode('utf-8'))
+        print('OUTPUT:' + p.stdout.decode('utf-8').rstrip())
         if p.returncode != 0:
-            print(json.dumps(('Deployment failed', 'OSTree failed to deploy the operating system tree.')), file=sys.stderr)
+            print('ERROR:' + json.dumps(('Deployment failed', 'OSTree failed to deploy the operating system tree.')))
             return False
     except Exception as e:
-        print(json.dumps(('Error executing ostreee', e.message)), file=sys.stderr)
+        print('ERROR:' + json.dumps(('Error executing ostreee', e.message)))
         return False
 
     # Determine the path of the new deployment
     sysroot.load(None)
     deployments = sysroot.get_deployments()
     if len(deployments) == 0:
-        print('No deployments available')
-        print(json.dumps(('No deployments found', 'OSTree failed to deploy operating system.')), file=sys.stderr)
+        print('OUTPUT:No deployments available')
+        print('ERROR:' + json.dumps(('No deployments found', 'OSTree failed to deploy operating system.')))
         return False
     deployment = deployments[0]
     deployment_path = sysroot.get_deployment_directory(deployment).get_path()
-    print('Deployment path: %s' % deployment_path)
-    print('RESULT:%s' % deployment_path)
+    print(f'OUTPUT:Deployment path: {deployment_path}')
+    print(f'RESULT:{deployment_path}')
+
+    print('QUIT')
 
     return True
 
@@ -130,7 +132,7 @@ def progress_cb(async_progress):
     status = async_progress.get_status()
     outstanding_fetches = async_progress.get_uint('outstanding-fetches')
     if status:
-        print('Status: {}'.format(status))
+        print(f'OUTPUT:Status: {status}')
     elif outstanding_fetches > 0:
         fetched = async_progress.get_uint('fetched')
         requested = async_progress.get_uint('requested')
@@ -138,7 +140,7 @@ def progress_cb(async_progress):
             percent = 0.0
         else:
             percent = fetched / requested
-        print('PROGRESS:{}'.format(percent))
+        print(f'PROGRESS:{percent}')
 
 
 if __name__ == '__main__':

@@ -114,22 +114,25 @@ def run():
 
     deployment_path = None
 
-    with subprocess.Popen([progname, install_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
-        (stdout, stderr) = p.communicate()
+    with subprocess.Popen([progname, install_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+        while True:
+            line = p.stdout.readline().rstrip().decode('utf-8')
+            if not line:
+                break
 
-        if p.returncode == 0:
-            output = stdout.decode('utf-8')
-            for line in output.split('\n'):
-                if line.startswith('PROGRESS'):
-                    percent = float(line[9:])
-                    libcalamares.job.setprogress(percent)
-                elif line.startswith('RESULT'):
-                    deployment_path = line[7:]
-                    libcalamares.globalstorage.insert('ostreeDeploymentPath', deployment_path)
-                else:
-                    libcalamares.utils.debug(line)
-        else:
-            return json.loads(stderr.decode('utf-8'))
+            if line.startswith('PROGRESS:'):
+                percent = float(line[9:])
+                libcalamares.job.setprogress(percent)
+            elif line.startswith('RESULT:'):
+                deployment_path = line[7:]
+                libcalamares.globalstorage.insert('ostreeDeploymentPath', deployment_path)
+            elif line.startswith('OUTPUT:'):
+                libcalamares.utils.debug(line[7:])
+            elif line.startswith('ERROR:'):
+                json.loads(line[6:])
+                break
+            elif line.startswith('QUIT'):
+                break
 
     if deployment_path is None:
         return ('No deployment path', 'Unable to find OS tree deployment.')
