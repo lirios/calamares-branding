@@ -76,6 +76,44 @@ def bind_mount(src, dest=None, bind_ro=False, recurse=True):
     libcalamares.globalstorage.insert('extraMounts', extra_mounts)
 
 
+def copy_bootloader_data():
+    """
+    Copy bootloader data files from the deployment checkout to
+    the target root.
+    """
+
+    fw_type = libcalamares.globalstorage.value('firmwareType')
+    install_path = libcalamares.globalstorage.value('rootMountPoint')
+    deployment_path = libcalamares.globalstorage.value('ostreeDeploymentPath')
+
+    # Destination directory
+    boot_path = install_path + '/boot'
+
+    # Where to find the data files
+    source_path = deployment_path + '/usr/lib/ostree-boot'
+    if not os.path.isdir(source_path):
+        source_path = deployment_path + '/boot'
+
+    # Copy data files
+    for fname in os.listdir(source_path):
+        src_path = os.path.join(source_path, fname)
+        dest_path = os.path.join(boot_path, fname)
+
+        # We want to copy only directories
+        if not os.path.isdir(src_path):
+            continue
+
+        # Special case for EFI subdirectory
+        if fname == 'efi':
+            if fw_type == 'efi':
+                for subname in os.listdir(src_path):
+                    sub_srcpath = os.path.join(src_path, subname)
+                    sub_destpath = os.path.join(dest_path, subname)
+                    subprocess.check_call(['cp', '-r', '-p', sub_srcpath, sub_destpath])
+        else:
+            subprocess.check_call(['cp', '-r', '-p', src_path, dest_path])
+
+
 def run():
     """
     Install the OS tree on the root file system.
@@ -148,6 +186,9 @@ def run():
     # Run tmpfiles to make subdirectories of /var
     subprocess.run(['systemd-tmpfiles', '--create', '--boot',
                     '--root=' + install_path], check=False)
+
+    # Copy boot loader files
+    copy_bootloader_data()
 
     # Reverse extra mounts
     extra_mounts = libcalamares.globalstorage.value('extraMounts')
