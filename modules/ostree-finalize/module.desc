@@ -1,0 +1,5 @@
+---
+type:       "job"
+name:       "ostree-finalize"
+interface:  "python"
+script:     "main.py"
