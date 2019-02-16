@@ -53,6 +53,9 @@ def install(install_path):
     else:
         remote_url = 'https://repo.liri.io/ostree/repo/'
 
+    if not os.path.exists(install_path):
+        os.makedirs(install_path)
+
     print(f'OUTPUT:Ref: {ref}')
     print(f'OUTPUT:Install path: {install_path}')
 
