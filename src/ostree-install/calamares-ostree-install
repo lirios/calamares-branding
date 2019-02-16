@@ -23,6 +23,7 @@
 #
 
 import gi
+import os
 import json
 import subprocess
 import sys
@@ -46,7 +47,12 @@ def install(install_path):
     }
     ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
     remote_name = 'lirios'
-    remote_url = 'https://repo.liri.io/ostree/repo/'
+
+    if os.path.isdir('/ostree/repo'):
+        remote_url = 'file:///ostree/repo'
+    else:
+        remote_url = 'https://repo.liri.io/ostree/repo/'
+
     print(f'OUTPUT:Ref: {ref}')
     print(f'OUTPUT:Install path: {install_path}')
 
