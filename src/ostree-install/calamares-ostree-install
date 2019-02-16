@@ -35,7 +35,7 @@ gi.require_version('RpmOstree', '1.0')
 from gi.repository import GLib, Gio, OSTree, RpmOstree
 
 
-def install(install_path):
+def install(url, ref, install_path):
     cancellable = None
 
     osname = 'lirios'
@@ -45,17 +45,18 @@ def install(install_path):
         'gpg-verify': GLib.Variant('b', not nogpg),
         'tls-permissive': GLib.Variant('b', noverifyssl),
     }
-    ref = RpmOstree.varsubst_basearch('lirios/unstable/${basearch}/desktop')
+    ref = RpmOstree.varsubst_basearch(ref)
     remote_name = 'lirios'
 
     if os.path.isdir('/ostree/repo'):
         remote_url = 'file:///ostree/repo'
     else:
-        remote_url = 'https://repo.liri.io/ostree/repo/'
+        remote_url = url
 
     if not os.path.exists(install_path):
         os.makedirs(install_path)
 
+    print(f'OUTPUT:URL: {url}')
     print(f'OUTPUT:Ref: {ref}')
     print(f'OUTPUT:Install path: {install_path}')
 
@@ -156,8 +157,10 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('url', help='remote repository URL')
+    parser.add_argument('ref', help='OS tree ref to install')
     parser.add_argument('installpath', help='where to install the OS tree')
     args = parser.parse_args()
 
-    if not install(args.installpath):
+    if not install(args.url, args.ref, args.installpath):
         sys.exit(-1)

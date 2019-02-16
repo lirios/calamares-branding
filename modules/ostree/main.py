@@ -177,7 +177,7 @@ def build_new_root():
 
     # Now bind mount /dev, /sys and /proc
     for mount_point in ('/dev', '/sys', '/proc'):
-        bind_mount(mount_point, new_install_path + mount_point)
+        bind_mount(mount_point, dest=new_install_path + mount_point, recurse=False)
 
     libcalamares.utils.debug(f'New root at {new_install_path} ready')
 
@@ -203,9 +203,12 @@ def run():
     # The Calamares Python interpreter freezes when loading gobject-introspection, so we moved the
     # code to an external process
 
+    url = libcalamares.job.configuration['ostreeUrl']
+    ref = libcalamares.job.configuration['ostreeRef']
+
     deployment_path = None
 
-    with subprocess.Popen([progname, install_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+    with subprocess.Popen([progname, url, ref, install_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
         while True:
             line = p.stdout.readline().rstrip().decode('utf-8')
             if not line:
