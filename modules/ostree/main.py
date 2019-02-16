@@ -103,6 +103,12 @@ def copy_bootloader_data():
         else:
             subprocess.check_call(['cp', '-r', '-p', src_path, dest_path])
 
+    # /boot/grub2/grubenv is a symlink to a file inside /boot/efi,
+    # remove it on BIOS systems since the target path doesn't exist
+    efi_grubenv_link = boot_path + '/grub2/grubenv'
+    if fw_type != 'efi' and os.path.islink(efi_grubenv_link):
+        os.unlink(efi_grubenv_link)
+
 
 def populate_var():
     """
