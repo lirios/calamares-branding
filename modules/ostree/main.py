@@ -23,6 +23,7 @@
 
 import json
 import subprocess
+import tempfile
 import libcalamares
 import os
 
@@ -46,11 +47,6 @@ def bind_mount(src, dest=None, bind_ro=False, recurse=True):
     :param recurse: Use --rbind to recurse, otherwise plain --bind
     """
 
-    if libcalamares.globalstorage.contains('extraMounts'):
-        extra_mounts = libcalamares.globalstorage.value('extraMounts')
-    else:
-        extra_mounts = []
-
     # Same basename by default
     if dest is None:
         dest = src
@@ -68,12 +64,6 @@ def bind_mount(src, dest=None, bind_ro=False, recurse=True):
         else:
             bindopt = '--bind'
         subprocess.check_call(['mount', bindopt, src, dest])
-
-    entry = {'device': src, 'mountPoint': dest}
-    if bind_ro or not recurse:
-        entry['options'] = 'bind'
-    extra_mounts.append(entry)
-    libcalamares.globalstorage.insert('extraMounts', extra_mounts)
 
 
 def copy_bootloader_data():
@@ -114,6 +104,72 @@ def copy_bootloader_data():
             subprocess.check_call(['cp', '-r', '-p', src_path, dest_path])
 
 
+def populate_var():
+    """
+    Copy files and directories from the var deployment to the /var partition
+    and ask systemd to create all the missing files and directories.
+    """
+
+    install_path = libcalamares.globalstorage.value('oldRootMountPoint')
+    new_install_path = libcalamares.globalstorage.value('rootMountPoint')
+    source_path = install_path + '/ostree/deploy/lirios/var'
+    dest_path = new_install_path + '/var'
+
+    # Create destination if it doesn't exist
+    mkdir_p(dest_path)
+
+    # Some files or directories might be in the deployment
+    if os.path.exists(install_path + '/var') and os.path.exists(source_path):
+        for fname in os.listdir(source_path):
+            src = os.path.join(source_path, fname)
+            dst = os.path.join(dest_path, fname)
+            subprocess.check_call(['cp', '-r', '-p', src, dst])
+
+    # The other files and directories must be created
+    subprocess.run(['systemd-tmpfiles', '--create', '--boot',
+                    '--root=' + new_install_path], check=False)
+
+
+def build_new_root():
+    """
+    Create a new root from the deployment.
+    """
+
+    partitions = libcalamares.globalstorage.value('partitions')
+    install_path = libcalamares.globalstorage.value('rootMountPoint')
+    deployment_path = libcalamares.globalstorage.value('ostreeDeploymentPath')
+
+    # We create a new root with part from the deployment and part from the physical root
+    new_install_path = tempfile.mkdtemp(prefix='ostree-root-')
+    libcalamares.globalstorage.insert('oldRootMountPoint', install_path)
+    libcalamares.globalstorage.insert('rootMountPoint', new_install_path)
+    mkdir_p(new_install_path)
+
+    # Bind mount deployment to the new root mount point
+    bind_mount(deployment_path, dest=new_install_path, recurse=False)
+
+    # Bind mount all partitions
+    for partition in partitions:
+        if partition['mountPoint'] in ('/', '/boot', '/var'):
+            continue
+        bind_mount(install_path + partition['mountPoint'], dest=new_install_path + partition['mountPoint'])
+
+    # Always bind mount /boot and /var into the new root, regardless of being separate partitions
+    bind_mount(install_path + '/boot', dest=new_install_path + '/boot')
+    if os.path.exists(install_path + '/var'):
+        bind_mount(install_path + '/var', dest=new_install_path + '/var')
+    else:
+        var_path = install_path + '/ostree/deploy/lirios/var'
+        bind_mount(var_path, dest=new_install_path + '/var')
+
+    # Bind mount the old root as /sysroot
+    bind_mount(install_path, dest=new_install_path + '/sysroot', bind_ro=True)
+
+    # Now bind mount /dev, /sys and /proc
+    for mount_point in ('/dev', '/sys', '/proc'):
+        bind_mount(mount_point, new_install_path + mount_point)
+
+
 def run():
     """
     Install the OS tree on the root file system.
@@ -129,21 +185,6 @@ def run():
         return (f"Bad mount point for root partition in globalstorage",
                  "globalstorage[\"rootMountPoint\"] is \"{install_path}\", which does not "
                  "exist, doing nothing")
-
-    # Partitions
-    partitions = libcalamares.globalstorage.value('partitions')
-
-    # OSTree /var
-    varroot = install_path + '/ostree/deploy/lirios/var'
-
-    # If the user wants /var into a separate partition, we need to make OSTree
-    # put those files there during installation
-    has_var_mountpoint = False
-    for partition in partitions:
-        if partition['mountPoint'] == '/var':
-            has_var_mountpoint = True
-            bind_mount(install_path + '/var', varroot, recurse=False)
-            break
 
     progname = '/usr/bin/calamares-ostree-install'
 
@@ -175,37 +216,13 @@ def run():
     if deployment_path is None:
         return ('No deployment path', 'Unable to find OS tree deployment.')
 
-    # If /var is on the root file system we want to bind mount it to /var
-    # so that chroot will be able to see it
-    if has_var_mountpoint is False:
-        bind_mount(varroot, dest=install_path + '/var', recurse=False)
-
-    # Bind mount deployment into installation path for chroot
-    bind_mount(deployment_path, install_path)
-
-    # Mount / to /sysroot otherwise we won't find the deployment path
-    # again after having bind mounted it to /
-    for partition in partitions:
-        if partition['mountPoint'] == '/':
-            fstype = partition.get('fs', '').lower()
-            options = partition.get('options', '')
-            libcalamares.utils.mount(partition['device'], install_path + '/sysroot', fstype, options)
-            break
-
-    # Run tmpfiles to make subdirectories of /var
-    subprocess.run(['systemd-tmpfiles', '--create', '--boot',
-                    '--root=' + install_path], check=False)
-
     # Copy boot loader files
     copy_bootloader_data()
 
-    # Reverse extra mounts
-    extra_mounts = libcalamares.globalstorage.value('extraMounts')
-    extra_mounts.reverse()
-    libcalamares.globalstorage.insert('extraMounts', extra_mounts)
+    # Build a new root with the deployment
+    build_new_root()
 
-    # Print extra mounts for debugging
-    for mount in libcalamares.globalstorage.value('extraMounts'):
-        libcalamares.utils.debug(f'Extra mount point: {mount}')
+    # Populate /var
+    populate_var()
 
     return None
