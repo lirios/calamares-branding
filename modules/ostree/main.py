@@ -183,6 +183,15 @@ def run():
     # Bind mount deployment into installation path for chroot
     bind_mount(deployment_path, install_path)
 
+    # Mount / to /sysroot otherwise we won't find the deployment path
+    # again after having bind mounted it to /
+    for partition in partitions:
+        if partition['mountPoint'] == '/':
+            fstype = partition.get('fs', '').lower()
+            options = partition.get('options', '')
+            libcalamares.utils.mount(partition['device'], install_path + '/sysroot', fstype, options)
+            break
+
     # Run tmpfiles to make subdirectories of /var
     subprocess.run(['systemd-tmpfiles', '--create', '--boot',
                     '--root=' + install_path], check=False)
