@@ -109,6 +109,8 @@ def copy_bootloader_data():
     if fw_type != 'efi' and os.path.islink(efi_grubenv_link):
         os.unlink(efi_grubenv_link)
 
+    libcalamares.utils.debug(f'All boot loader data files copied to {boot_path}')
+
 
 def populate_var():
     """
@@ -134,6 +136,8 @@ def populate_var():
     # The other files and directories must be created
     subprocess.run(['systemd-tmpfiles', '--create', '--boot',
                     '--root=' + new_install_path], check=False)
+
+    libcalamares.utils.debug(f'Populated {dest_path}')
 
 
 def build_new_root():
@@ -174,6 +178,8 @@ def build_new_root():
     # Now bind mount /dev, /sys and /proc
     for mount_point in ('/dev', '/sys', '/proc'):
         bind_mount(mount_point, new_install_path + mount_point)
+
+    libcalamares.utils.debug(f'New root at {new_install_path} ready')
 
 
 def run():
