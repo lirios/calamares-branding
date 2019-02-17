@@ -156,7 +156,7 @@ def build_new_root():
     mkdir_p(new_install_path)
 
     # Bind mount deployment to the new root mount point
-    bind_mount(deployment_path, dest=new_install_path, recurse=False)
+    bind_mount(deployment_path, dest=new_install_path)
 
     # Bind mount all partitions
     for partition in partitions:
@@ -173,7 +173,7 @@ def build_new_root():
         bind_mount(var_path, dest=new_install_path + '/var')
 
     # Bind mount the old root as /sysroot
-    bind_mount(install_path, dest=new_install_path + '/sysroot', bind_ro=True)
+    bind_mount(install_path, dest=new_install_path + '/sysroot')
 
     # Now bind mount /dev, /sys and /proc
     for mount_point in ('/dev', '/sys', '/proc'):
