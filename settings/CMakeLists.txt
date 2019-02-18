@@ -4,6 +4,7 @@ install(
         "bootloader.conf"
         "displaymanager.conf"
         "grubcfg.conf"
+        "services.conf"
         "welcome.conf"
     DESTINATION
         "${INSTALL_SYSCONFDIR}/calamares/modules"
