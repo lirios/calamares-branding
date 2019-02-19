@@ -119,32 +119,14 @@ def copy_bootloader_data():
     libcalamares.utils.debug(f'All boot loader data files copied to {boot_path}')
 
 
-def populate_var():
+def create_tmpfiles():
     """
-    Copy files and directories from the var deployment to the /var partition
-    and ask systemd to create all the missing files and directories.
+    Create temporary files and directories.
     """
 
-    install_path = libcalamares.globalstorage.value('oldRootMountPoint')
     new_install_path = libcalamares.globalstorage.value('rootMountPoint')
-    source_path = install_path + '/ostree/deploy/lirios/var'
-    dest_path = new_install_path + '/var'
-
-    # Create destination if it doesn't exist
-    mkdir_p(dest_path)
-
-    # Some files or directories might be in the deployment
-    if os.path.exists(install_path + '/var') and os.path.exists(source_path):
-        for fname in os.listdir(source_path):
-            src = os.path.join(source_path, fname)
-            dst = os.path.join(dest_path, fname)
-            subprocess.check_call(['cp', '-r', '-p', src, dst])
-
-    # The other files and directories must be created
     subprocess.run(['systemd-tmpfiles', '--create', '--boot',
                     '--root=' + new_install_path], check=False)
-
-    libcalamares.utils.debug(f'Populated {dest_path}')
 
 
 def build_new_root():
@@ -244,7 +226,7 @@ def run():
     # Build a new root with the deployment
     build_new_root()
 
-    # Populate /var
-    populate_var()
+    # Create temporary files and directories
+    create_tmpfiles()
 
     return None
