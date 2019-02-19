@@ -1,0 +1,5 @@
+---
+type:       "job"
+name:       "ostree-bootloader"
+interface:  "python"
+script:     "main.py"
