@@ -109,6 +109,13 @@ def copy_bootloader_data():
     if fw_type != 'efi' and os.path.islink(efi_grubenv_link):
         os.unlink(efi_grubenv_link)
 
+    # rpm-ostree creates /boot/loader/grub.cfg when using grub, so
+    # we must link the traditional /boot/grub2/grub.cfg to it
+    grubcfg_orig = boot_path + '/grub2/grub.cfg'
+    if os.path.exists(grubcfg_orig):
+        os.unlink(grubcfg_orig)
+    os.symlink('../loader/grub.cfg', grubcfg_orig)
+
     libcalamares.utils.debug(f'All boot loader data files copied to {boot_path}')
 
 
