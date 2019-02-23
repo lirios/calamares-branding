@@ -202,8 +202,8 @@ def run():
     # The Calamares Python interpreter freezes when loading gobject-introspection, so we moved the
     # code to an external process
 
-    url = libcalamares.job.configuration['ostreeUrl']
-    ref = libcalamares.job.configuration['ostreeRef']
+    url = libcalamares.job.configuration['url']
+    ref = libcalamares.job.configuration['ref']
 
     deployment_path = None
 
