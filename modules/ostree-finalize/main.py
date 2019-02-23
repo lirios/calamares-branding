@@ -22,6 +22,7 @@
 #
 
 import libcalamares
+import subprocess
 
 def run():
     # Swap the root mount point so that a second invokation of the `umount` job
@@ -30,5 +31,18 @@ def run():
     install_path = libcalamares.globalstorage.value('oldRootMountPoint')
     libcalamares.globalstorage.insert('rootMountPoint', install_path)
     libcalamares.globalstorage.remove('oldRootMountPoint')
+
+    # Unmount
+    mountpoints = libcalamares.globalstorage.value('ostreeMountPoints')
+    libcalamares.utils.debug('OSTree mount points to unmount:')
+    for mountpoint in mountpoints:
+        libcalamares.utils.debug(mountpoint)
+    for mountpoint in mountpoints:
+        subprocess.run(['umount', '-lv', mountpoint])
+        libcalamares.utils.debug(f'Unmounted: {mountpoint}')
+
+    # No longer needs this list for all mountpoints where unmounted
+    if mountpoints:
+        libcalamares.globalstorage.remove('ostreeMountPoints')
 
     return None

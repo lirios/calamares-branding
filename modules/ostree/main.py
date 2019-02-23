@@ -47,6 +47,11 @@ def bind_mount(src, dest=None, bind_ro=False, recurse=True):
     :param recurse: Use --rbind to recurse, otherwise plain --bind
     """
 
+    if libcalamares.globalstorage.contains('ostreeMountPoints'):
+        mountpoints = libcalamares.globalstorage.value('ostreeMountPoints')
+    else:
+        mountpoints = []
+
     # Same basename by default
     if dest is None:
         dest = src
@@ -58,12 +63,17 @@ def bind_mount(src, dest=None, bind_ro=False, recurse=True):
     if bind_ro:
         subprocess.check_call(['mount', '--bind', src, src])
         subprocess.check_call(['mount', '--bind', '-o', 'remount,ro', src, src])
+        mountpoints.append(src)
+        mountpoints.append(src)
     else:
         if recurse:
             bindopt = '--rbind'
         else:
             bindopt = '--bind'
         subprocess.check_call(['mount', bindopt, src, dest])
+        mountpoints.append(dest)
+
+    libcalamares.globalstorage.insert('ostreeMountPoints', mountpoints)
 
 
 def copy_bootloader_data():
@@ -228,5 +238,10 @@ def run():
 
     # Create temporary files and directories
     create_tmpfiles()
+
+    # Reverse mountpoints list so that it's ready for next stages
+    mountpoints = libcalamares.globalstorage.value('ostreeMountPoints')
+    mountpoints.reverse()
+    libcalamares.globalstorage.insert('ostreeMountPoints', mountpoints)
 
     return None
