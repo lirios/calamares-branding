@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Install to Hard Disk Drive
+Name=Install to Hard Drive
 GenericName=Live Installer
 Exec=/usr/bin/calamares.sh
 Icon=system-software-install

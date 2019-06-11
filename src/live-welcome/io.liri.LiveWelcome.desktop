@@ -1,0 +1,13 @@
+[Desktop Entry]
+Categories=Qt;X-Liri;System;
+Comment=Prompts the user to either try Liri OS or install to hard drive
+Exec=liri-live-welcome
+Icon=preferences-system
+Keywords=System;Live;Installer;
+Name=Welcome to Liri OS
+OnlyShowIn=X-Liri;
+StartupNotify=true
+Terminal=false
+TryExec=liri-live-welcome
+Type=Application
+X-AppStream-Ignore=true

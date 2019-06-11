@@ -1,0 +1,16 @@
+[main]
+host = https://www.transifex.com
+
+[liri-installer.live-welcome]
+type = QT
+source_lang = en
+liri_source_directory = src/live-welcome
+source_file = src/live-welcome/translations/liri-live-welcome.ts
+file_filter = src/live-welcome/translations/liri-live-welcome_<lang>.ts
+
+[liri-installer.live-welcome-desktop]
+type = DESKTOP
+source_lang = en
+source_file = src/live-welcome/io.liri.LiveWelcome.desktop.in
+liri_dest_file = src/live-welcome/io.liri.LiveWelcome.desktop
+file_filter = src/live-welcome/translations/io.liri.LiveWelcome_<lang>.desktop
