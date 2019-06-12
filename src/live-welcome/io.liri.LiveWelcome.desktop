@@ -1,10 +1,12 @@
 [Desktop Entry]
 Categories=Qt;X-Liri;System;
 Comment=Prompts the user to either try Liri OS or install to hard drive
+Comment[it]=Permette all'utente di provare Liri OS oppure installare su disco
 Exec=liri-live-welcome
 Icon=preferences-system
 Keywords=System;Live;Installer;
 Name=Welcome to Liri OS
+Name[it]=Benvenuto a Liri OS
 OnlyShowIn=X-Liri;
 StartupNotify=true
 Terminal=false
