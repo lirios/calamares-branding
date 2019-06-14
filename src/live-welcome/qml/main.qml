@@ -29,10 +29,10 @@ import Fluid.Controls 1.0 as FluidControls
 
 ApplicationWindow {
     title: qsTr("Welcome to Liri OS")
-    width: 700
-    height: 500
-    minimumWidth: 700
-    minimumHeight: 500
+    width: 600
+    height: 400
+    minimumWidth: 600
+    minimumHeight: 400
     visible: true
 
     Material.accent: Material.Blue
