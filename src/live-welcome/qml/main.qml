@@ -47,6 +47,7 @@ ApplicationWindow {
             text: qsTr("Welcome to Liri OS")
             subText: qsTr("You are currently running Liri OS from live media.\nYou can install Liri OS now, or launch \"Install to Hard Drive\" later.")
 
+            Layout.fillWidth: true
             Layout.preferredHeight: 300
             Layout.alignment: Qt.AlignCenter
         }
