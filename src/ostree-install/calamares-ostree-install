@@ -48,11 +48,6 @@ def install(url, ref, install_path):
     ref = RpmOstree.varsubst_basearch(ref)
     remote_name = 'lirios'
 
-    if os.path.isdir('/ostree/repo'):
-        remote_url = 'file:///ostree/repo'
-    else:
-        remote_url = url
-
     if not os.path.exists(install_path):
         os.makedirs(install_path)
 
@@ -82,7 +77,7 @@ def install(url, ref, install_path):
     repo.set_disable_fsync(True)
 
     repo.remote_change(None, OSTree.RepoRemoteChange.ADD_IF_NOT_EXISTS,
-                       remote_name, remote_url,
+                       remote_name, url,
                        GLib.Variant('a{sv}', remote_options), cancellable)
 
     progress = OSTree.AsyncProgress.new()
