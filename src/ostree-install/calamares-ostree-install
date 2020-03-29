@@ -128,9 +128,9 @@ def install(url, ref, install_path):
     print(f'OUTPUT:Deployment path: {deployment_path}')
     print(f'RESULT:{deployment_path}')
 
-    # Remove remote configured in /etc/ostree/remote.d/lirios.conf to avoid
+    # Remove remote configured in /etc/ostree/remotes.d/lirios.conf to avoid
     # conflicts with the remote set in /sysroot/ostree/repo/config (see above)
-    remote_conf_filename = os.path.join(deployment_path, 'etc/ostree/remote.d/lirios.conf')
+    remote_conf_filename = os.path.join(deployment_path, 'etc/ostree/remotes.d/lirios.conf')
     if os.path.exists(remote_conf_filename):
         os.unlink(remote_conf_filename)
 
