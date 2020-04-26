@@ -64,8 +64,9 @@ Presentation {
             anchors.bottom: parent.bottom
             anchors.margins: 24
             width: 450
-            text: qsTr("<p>Our desktop and apps follow the Material Design language from Google.</p>" +
-                       "<p>This means the operating system will look consistent, be easy to use and undestand," +
+            text: qsTr("<h1>Design language</h1><br/>" +
+                       "<p>Our desktop and apps follow the Material Design language from Google.</p>" +
+                       "<p>The operating system looks consistent, it's easy to use and undestand, " +
                        "and have a high degree of polish and animations.</p>")
         }
     }
@@ -76,9 +77,40 @@ Presentation {
             anchors.bottom: parent.bottom
             anchors.margins: 24
             width: 450
-            text: qsTr("<p>Our apps are installed by default and these include: file manager, terminal emulator," +
-                       "text editor, web browser, calculator, app installer and settings.</p>" +
-                       "<p>More apps can be installed from Flathub.</p>")
+            text: qsTr("<h1>Batteries included</h1><br/>" +
+                       "<p>Our apps are installed by default and these include: file manager, terminal emulator," +
+                       "text editor, web browser, calculator, app installer and settings.</p>")
+        }
+    }
+
+    SlideImage {
+        FocusText {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 24
+            width: 450
+            text: qsTr("<h1>Find the software you need</h1><br/>" +
+                       "<p>Say goodbye to searching the web for new software.</p>" +
+                       "<p>With access to AppCenter you can install apps from Flathub " +
+                       "and other repositories, including apps from the Fedora archive.</p>" +
+                       "<p>Just type in what you are looking for, or explore categories " +
+                       "such as XXX, alongside helpful reviews from other users.</p>")
+        }
+    }
+
+
+
+    SlideImage {
+        FocusText {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 24
+            width: 450
+            text: qsTr("<h1>Everything you need for the office</h1><br/>" +
+                       "<p>LibreOffice is the free office suite packed with everything " +
+                       "you need to create documents, spreadsheets and presentations.</p>" +
+                       "<p>Compatible with Microsoft Office file formats, it gives you " +
+                       "all the features you need, without the price tag.</p>")
         }
     }
 }
