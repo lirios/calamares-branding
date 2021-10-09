@@ -30,3 +30,5 @@ liri_add_executable(LiveWelcome
         Qt5::QuickControls2
     QTQUICK_COMPILER
 )
+
+liri_finalize_executable(LiveWelcome)
