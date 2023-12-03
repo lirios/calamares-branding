@@ -1,34 +1,35 @@
 # Translations
 file(GLOB LiveWelcome_TRANSLATIONS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*_*.ts")
-qt5_add_translation(LiveWelcome_QM_FILES ${LiveWelcome_TRANSLATIONS})
+qt6_add_translation(LiveWelcome_QM_FILES ${LiveWelcome_TRANSLATIONS})
 install(FILES ${LiveWelcome_QM_FILES}
-        DESTINATION "${INSTALL_DATADIR}/liri-live-welcome/translations")
+        DESTINATION "${KDE_INSTALL_DATADIR}/liri-live-welcome/translations")
 
-liri_add_executable(LiveWelcome
-    OUTPUT_NAME
-        "liri-live-welcome"
-    SOURCES
-        main.cpp
-        runner.cpp
-        runner.h
-        ${LiveWelcome_QM_FILES}
-    DEFINES
-        QT_NO_CAST_FROM_ASCII
-        QT_NO_FOREACH
-        VERSION="${PROJECT_VERSION}"
-    DESKTOP
-        "${CMAKE_CURRENT_SOURCE_DIR}/io.liri.LiveWelcome.desktop"
-    DESKTOP_INSTALL_DIRECTORY
-        "${INSTALL_SYSCONFDIR}/xdg/autostart"
-    RESOURCES
-        "live-welcome.qrc"
-    LIBRARIES
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Qml
-        Qt5::Quick
-        Qt5::QuickControls2
-    QTQUICK_COMPILER
+set(SOURCES
+    main.cpp
+    runner.cpp runner.h
+    io.liri.LiveWelcome.desktop
 )
 
-liri_finalize_executable(LiveWelcome)
+qt_add_resources(SOURCES live-welcome.qrc)
+qt6_add_executable(LiveWelcome
+    MANUAL_FINALIZATION
+    ${SOURCES}
+    ${LiveWelcome_QM_FILES}
+)
+
+set_target_properties(LiveWelcome PROPERTIES OUTPUT_NAME "liri-live-welcome")
+
+target_compile_definitions(LiveWelcome PRIVATE VERSION="${PROJECT_VERSION}")
+
+target_link_libraries(LiveWelcome PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::QuickControls2
+)
+
+qt6_finalize_target(LiveWelcome)
+
+install(TARGETS LiveWelcome DESTINATION ${KDE_INSTALL_BINDIR})
+install(FILES io.liri.LiveWelcome.desktop DESTINATION ${KDE_INSTALL_SYSCONFDIR}/xdg/autostart)

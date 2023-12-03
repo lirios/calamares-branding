@@ -12,8 +12,8 @@ Liri OS branding and customizations for Calamares.
 
 The following modules and their dependencies are required:
 
- * [cmake](https://gitlab.kitware.com/cmake/cmake) >= 3.10.0
- * [cmake-shared](https://github.com/lirios/cmake-shared.git) >= 1.0.0
+ * [cmake](https://gitlab.kitware.com/cmake/cmake) >= 3.19.0
+ * [extra-cmake-modules](https://invent.kde.org/frameworks/extra-cmake-modules) >= 5.245.0
 
 ## Installation
 

@@ -8,5 +8,5 @@ install(
         "Slideshow.qml"
         "wallpaper.png"
     DESTINATION
-        "${INSTALL_DATADIR}/calamares/branding/liri"
+        "${KDE_INSTALL_DATADIR}/calamares/branding/liri"
 )
